@@ -5,11 +5,16 @@ declare global {
   var __pgPool: Pool | undefined;
 }
 
-// Ensure Neon connection string uses SSL
-const connectionString = process.env.DATABASE_URL;
+// Ensure Neon connection string uses modern libpq-compatible SSL mode
+let connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error("DATABASE_URL is not set in environment variables");
+}
+
+// Normalize sslmode=require to sslmode=verify-full to prevent Node security warning
+if (connectionString.includes("sslmode=require")) {
+  connectionString = connectionString.replace("sslmode=require", "sslmode=verify-full");
 }
 
 export const pool: Pool =

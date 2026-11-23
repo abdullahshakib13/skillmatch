@@ -22,8 +22,13 @@ if (fs.existsSync(envPath)) {
   });
 }
 
+let connectionString = process.env.DATABASE_URL;
+if (connectionString && connectionString.includes("sslmode=require")) {
+  connectionString = connectionString.replace("sslmode=require", "sslmode=verify-full");
+}
+
 const client = new Client({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
   ssl: { rejectUnauthorized: false },
 });
 
